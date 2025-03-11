@@ -1,0 +1,56 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import directus, { type Page } from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const result = await directus.query<{ pages: Page[] }>(`
+    query Page {
+      pages: Page(filter: { domain_id: { domain: { _eq: "toto.com" } } }) {
+          id
+          status
+          seo
+          content
+          url
+          title
+          domain: domain_id {
+              domain
+              social_image
+              name
+              tags
+              status
+          }
+      }
+    }
+  `);
+
+  const { pages } = result;
+  return pages.map((page) => {
+    return {
+      params: { url: page.url ? page.url : '' },
+      props: page,
+    };
+  });
+}
+
+const page = Astro.props;
+const { seo, domain } = page;
+
+const metadata = {
+  title: seo.title + ' | ' + domain?.domain,
+  description: seo.description,
+  ignoreTitleTemplate: true,
+};
+
+console.log(page.content);
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-4xl">
+    <h1 class="font-bold font-heading text-4xl md:text-5xl leading-tighter tracking-tighter">{page.title}</h1>
+    <div
+      class="mx-auto prose prose-lg max-w-4xl dark:prose-invert dark:prose-headings:text-slate-300 prose-md prose-headings:font-heading prose-headings:leading-tighter prose-headings:tracking-tighter prose-headings:font-bold prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-md prose-img:shadow-lg mt-8"
+    >
+      <div set:html={page.content} />
+    </div>
+  </section>
+</Layout>
