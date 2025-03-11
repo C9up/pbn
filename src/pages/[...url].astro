@@ -15,7 +15,18 @@ export async function getStaticPaths() {
           title
           domain: domain_id {
               domain
-              social_image
+              social_image {
+                id
+                description
+                filesize
+                filename_disk
+                storage
+                type
+                folder
+                description
+                width
+                height
+              }
               name
               tags
               status
