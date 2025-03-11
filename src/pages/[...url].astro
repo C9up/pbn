@@ -2,6 +2,7 @@
 import Layout from '~/layouts/Layout.astro';
 import directus, { type Page } from '../../lib/directus';
 
+export const prerender = true;
 export async function getStaticPaths() {
   const result = await directus.query<{ pages: Page[] }>(`
     query Page {
@@ -36,12 +37,10 @@ const page = Astro.props;
 const { seo, domain } = page;
 
 const metadata = {
-  title: seo.title + ' | ' + domain?.domain,
+  title: `${seo.title} | ${domain?.domain}`,
   description: seo.description,
   ignoreTitleTemplate: true,
 };
-
-console.log(page.content);
 ---
 
 <Layout metadata={metadata}>
